@@ -1,5 +1,6 @@
 import type { AnalysisResponse, DocumentParagraph, FlaggedItem, SourceCandidate } from "../../src/shared/types.js";
 import { clampScore, getStats, jaccardSimilarity, makeNgrams, pickRepresentativeQuery, riskLevel, tokenize } from "./textProcessing.js";
+import { searchSemanticScholar } from "./semanticScholar.js";
 
 const DOMAINS = ["garuda.kemdikbud.go.id","neliti.com","moraref.kemenag.go.id","onesearch.id","doaj.org","jurnal.ugm.ac.id","ejournal.undip.ac.id","journal.unnes.ac.id","ejournal.upi.edu","journal.uny.ac.id"];
 
@@ -44,8 +45,12 @@ async function sourcesFor(paragraphs: DocumentParagraph[]): Promise<SourceCandid
   const all: SourceCandidate[] = [];
   for (const p of picks) {
     const q = pickRepresentativeQuery(p.text);
-    const [g,o] = await Promise.all([google(q).catch(()=>[]), openAlex(q).catch(()=>[])]);
-    all.push(...g,...o);
+    const [g, o, s] = await Promise.all([
+      google(q).catch(()=>[]), 
+      openAlex(q).catch(()=>[]),
+      searchSemanticScholar(q).catch(()=>[])
+    ]);
+    all.push(...g, ...o, ...s);
   }
   const seen = new Set<string>();
   return all.filter(s => { const k=s.url.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; }).slice(0,10);

@@ -13,12 +13,12 @@
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Jurnal AI Assistant"/>
   <Description DefaultValue="Pilih teks di dokumen Word, lalu gunakan AI untuk membantu menulis, merapikan, dan menyusun jurnal akademik."/>
-  <IconUrl DefaultValue="https://YOUR-VERCEL-DOMAIN.vercel.app/assets/icon-64.png"/>
-  <HighResolutionIconUrl DefaultValue="https://YOUR-VERCEL-DOMAIN.vercel.app/assets/icon-80.png"/>
+  <IconUrl DefaultValue="https://microsoft-word-ai-dewa.vercel.app/assets/icon-64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://microsoft-word-ai-dewa.vercel.app/assets/icon-80.png"/>
   
-  <SupportUrl DefaultValue="https://YOUR-VERCEL-DOMAIN.vercel.app/help"/>
+  <SupportUrl DefaultValue="https://microsoft-word-ai-dewa.vercel.app/help"/>
   <AppDomains>
-    <AppDomain>https://YOUR-VERCEL-DOMAIN.vercel.app</AppDomain>
+    <AppDomain>https://microsoft-word-ai-dewa.vercel.app</AppDomain>
   </AppDomains>
 
   <Hosts>
@@ -26,7 +26,7 @@
   </Hosts>
 
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://YOUR-VERCEL-DOMAIN.vercel.app/src/taskpane/taskpane.html"/>
+    <SourceLocation DefaultValue="https://microsoft-word-ai-dewa.vercel.app/taskpane.html"/>
   </DefaultSettings>
 
   <Permissions>ReadWriteDocument</Permissions>
@@ -76,13 +76,13 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://YOUR-VERCEL-DOMAIN.vercel.app/assets/icon-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://YOUR-VERCEL-DOMAIN.vercel.app/assets/icon-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://YOUR-VERCEL-DOMAIN.vercel.app/assets/icon-80.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="https://microsoft-word-ai-dewa.vercel.app/assets/icon-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://microsoft-word-ai-dewa.vercel.app/assets/icon-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://microsoft-word-ai-dewa.vercel.app/assets/icon-80.png"/>
       </bt:Images>
       <bt:Urls>
         <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://go.microsoft.com/fwlink/?LinkId=276812" />
-        <bt:Url id="Taskpane.Url" DefaultValue="https://YOUR-VERCEL-DOMAIN.vercel.app/src/taskpane/taskpane.html" />
+        <bt:Url id="Taskpane.Url" DefaultValue="https://microsoft-word-ai-dewa.vercel.app/taskpane.html" />
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GetStarted.Title" DefaultValue="Get started with Jurnal AI Assistant!"/>

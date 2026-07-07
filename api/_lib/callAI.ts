@@ -55,17 +55,20 @@ export async function callAI(action: AIAction, request: AIRequestBody): Promise<
           content: request.text
         }
       ],
-      temperature: 0.3
+      temperature: 0.3,
+      stream: false
     })
   });
+
+  const responseText = await response.text();
 
   if (!response.ok) {
     let detail = "";
     try {
-      const errorPayload = (await response.json()) as { error?: { message?: string }; message?: string };
+      const errorPayload = JSON.parse(responseText) as { error?: { message?: string }; message?: string };
       detail = errorPayload.error?.message || errorPayload.message || "";
     } catch {
-      detail = "";
+      detail = responseText.slice(0, 200);
     }
 
     throw new AIServiceError(
@@ -73,7 +76,12 @@ export async function callAI(action: AIAction, request: AIRequestBody): Promise<
     );
   }
 
-  const data = (await response.json()) as ChatCompletionResponse;
+  let data: ChatCompletionResponse;
+  try {
+    data = JSON.parse(responseText) as ChatCompletionResponse;
+  } catch (err: any) {
+    throw new AIServiceError(`Gagal parse JSON dari AI API: ${err?.message || ""}. Raw response: ${responseText.slice(0, 500)}`);
+  }
   const result = data.choices?.[0]?.message?.content?.trim();
 
   if (!result) {

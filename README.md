@@ -1,56 +1,64 @@
 # Jurnal AI Assistant
 
-Microsoft Word Add-in production-ready berbasis TypeScript, Office.js, Vite, dan Vercel Serverless Functions untuk membantu menulis, merapikan, menyusun, dan mereview naskah jurnal akademik dengan AI API pribadi.
+Microsoft Word Add-in berbasis TypeScript + Office.js untuk membantu menulis, merapikan, menyusun, dan memformat jurnal akademik menggunakan AI API pribadi melalui backend Vercel Serverless Functions.
 
 ## 1. Deskripsi Project
 
-**Jurnal AI Assistant** membantu pengguna Microsoft Word memilih teks di dokumen, mengirim teks tersebut ke backend serverless yang aman, memanggil AI API kompatibel OpenAI Chat Completions, lalu menampilkan hasilnya sebagai preview sebelum dimasukkan kembali ke dokumen.
+**Jurnal AI Assistant** adalah task pane add-in untuk Microsoft Word. User dapat memilih teks di Word, memberi instruksi akademik, memanggil AI melalui serverless backend, melihat preview hasil, lalu memilih apakah hasil akan dimasukkan ke dokumen sebagai teks biasa atau block terformat.
 
-Frontend tidak pernah menyimpan atau mengekspos API key. Semua credential hanya digunakan di backend melalui environment variables.
+API key tidak pernah disimpan di frontend. Semua credential hanya dibaca dari environment variable di backend.
 
 ## 2. Fitur Utama
 
-- Membaca teks yang sedang dipilih di Microsoft Word.
-- Mengirim teks terpilih ke endpoint backend Vercel.
-- Memanggil AI API melalui serverless function.
-- Preview hasil AI di task pane.
-- Kontrol manual:
-  - Replace selected text
-  - Insert below selection
-  - Copy result
-  - Clear result
-- Mode bahasa:
-  - Indonesia
-  - English
-- Gaya penulisan:
-  - Academic Journal
-  - Formal
-  - Concise
-  - Critical Review
-- Aksi AI:
-  - Rapikan Bahasa Akademik
+- Membaca teks terpilih dari Microsoft Word.
+- Chat-style academic agent untuk workflow penulisan jurnal bertahap.
+- Endpoint aksi cepat:
+  - Rapikan bahasa akademik
   - Parafrase
-  - Buat Abstrak
-  - Buat Outline Jurnal
-  - Perkuat Argumen
-  - Ringkas Teks
-- Validasi request, CORS, error handling aman, dan environment variable untuk credential.
+  - Buat abstrak
+  - Buat outline jurnal
+  - Perkuat argumen
+  - Ringkas teks
+- Endpoint agent:
+  - Rencana artikel
+  - Outline
+  - Research gap
+  - Pendahuluan
+  - Literature review
+  - Metodologi
+  - Hasil dan pembahasan
+  - Kesimpulan
+  - Abstrak
+  - Revisi
+- Preview hasil sebelum masuk ke dokumen.
+- Insert formatted ke Word dengan gaya akademik default:
+  - Times New Roman
+  - Heading
+  - Title
+  - Abstract
+  - Paragraph justify
+  - Line spacing
+- Replace selected text.
+- Insert plain text below selection.
+- Copy result.
+- Loading, error, success state.
+- Character counter dan warning untuk teks panjang.
+- CORS helper dan validasi request.
+- Siap push ke GitHub dan deploy ke Vercel.
 
 ## 3. Arsitektur Singkat
 
 ```text
 Microsoft Word
   ↓ Office.js
-Task Pane Frontend
-  ↓ fetch relative path /api/ai/*
-Vercel Serverless API
-  ↓ Authorization Bearer dari environment variable
-AI API kompatibel OpenAI Chat Completions
-  ↓
-Preview hasil di task pane
-  ↓ user action
-Dokumen Word
+Task Pane Frontend (Vite + TypeScript)
+  ↓ relative API path /api/ai/*
+Vercel Serverless Functions
+  ↓ Authorization: Bearer AI_API_KEY
+OpenAI-compatible Chat Completions API
 ```
+
+Frontend hanya mengirim teks, konfigurasi bahasa/gaya, dan instruksi user. Backend membuat prompt, memvalidasi input, memanggil AI API, lalu mengembalikan hasil aman ke frontend.
 
 ## 4. Tech Stack
 
@@ -66,7 +74,7 @@ Backend:
 
 - Vercel Serverless Functions
 - TypeScript
-- Native fetch
+- Native `fetch`
 - Environment variables
 
 Deployment:
@@ -88,6 +96,7 @@ jurnal-ai-assistant/
 │     └─ types.ts
 ├─ api/
 │  ├─ ai/
+│  │  ├─ agent.ts
 │  │  ├─ rewrite.ts
 │  │  ├─ paraphrase.ts
 │  │  ├─ abstract.ts
@@ -102,10 +111,6 @@ jurnal-ai-assistant/
 │     └─ cors.ts
 ├─ public/
 │  └─ assets/
-│     ├─ icon-16.png
-│     ├─ icon-32.png
-│     ├─ icon-64.png
-│     └─ icon-80.png
 ├─ manifest.xml
 ├─ manifest.production.xml
 ├─ package.json
@@ -129,100 +134,90 @@ npm install
 npm run dev
 ```
 
-Server development akan berjalan di:
+Vite akan menjalankan task pane. Manifest development diarahkan ke:
 
 ```text
-https://localhost:3000
+https://localhost:3000/taskpane.html
 ```
 
-Task pane development manifest diarahkan ke:
-
-```text
-https://localhost:3000/src/taskpane/taskpane.html
-```
-
-Catatan: Microsoft Office Add-in membutuhkan HTTPS. Project ini dikonfigurasi agar Vite menggunakan HTTPS lokal.
+Untuk sideload Word Add-in, Office biasanya membutuhkan HTTPS. Jika browser menolak sertifikat lokal, gunakan sertifikat lokal/trusted dev server sesuai setup Office Add-in Anda.
 
 ## 8. Membuat File `.env` Lokal
 
-Copy file contoh:
+Salin contoh environment:
 
 ```bash
 cp .env.example .env
 ```
 
-Isi sesuai AI API Anda:
+Isi variabel berikut:
 
 ```env
-AI_API_KEY="sk-your-ai-api-key"
-AI_API_BASE_URL="https://api.openai.com/v1"
-AI_MODEL="gpt-3.5-turbo"
+AI_API_KEY=isi_api_key_anda
+AI_API_BASE_URL=https://api.openai.com/v1
+AI_MODEL=gpt-4o-mini
 MAX_INPUT_CHARS=50000
-ALLOWED_ORIGIN=""
+ALLOWED_ORIGIN=
 ```
 
-Untuk development, `ALLOWED_ORIGIN` boleh dikosongkan. Untuk production, isi dengan domain Vercel Anda.
+Keterangan:
+
+- `AI_API_KEY`: API key AI Anda.
+- `AI_API_BASE_URL`: base URL provider yang kompatibel dengan OpenAI Chat Completions.
+- `AI_MODEL`: nama model.
+- `MAX_INPUT_CHARS`: batas input, default 50000.
+- `ALLOWED_ORIGIN`: origin frontend production, boleh kosong saat development.
 
 ## 9. Test Endpoint API
 
-Setelah project berjalan di Vercel atau melalui local server yang mendukung functions, test endpoint:
+Setelah server Vercel/dev berjalan:
 
 ```bash
-curl -X POST "https://YOUR-VERCEL-DOMAIN.vercel.app/api/ai/rewrite" \
+curl -X POST http://localhost:3000/api/ai/rewrite \
   -H "Content-Type: application/json" \
   -d '{
-    "text": "Penelitian ini penting untuk dilakukan karena memberikan dampak terhadap kualitas pembelajaran.",
+    "text": "teks akademik yang ingin diperbaiki",
     "language": "id",
     "style": "academic journal",
-    "userInstructions": "buat lebih formal dan ringkas"
+    "userInstructions": "buat lebih formal"
   }'
 ```
 
-Response sukses:
+Test endpoint agent:
 
-```json
-{
-  "result": "..."
-}
+```bash
+curl -X POST http://localhost:3000/api/ai/agent \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Buat outline artikel jurnal tentang penggunaan AI dalam literasi akademik mahasiswa.",
+    "language": "id",
+    "articleType": "research article",
+    "field": "education",
+    "style": "academic journal",
+    "targetLength": "medium",
+    "currentStep": "start",
+    "history": []
+  }'
 ```
 
-Response error:
-
-```json
-{
-  "error": "pesan error yang jelas"
-}
-```
-
-## 10. Sideload Add-in ke Microsoft Word
+## 10. Cara Sideload Add-in ke Microsoft Word
 
 ### Development
 
 1. Jalankan:
-
    ```bash
    npm run dev
    ```
-
-2. Gunakan file:
-
-   ```text
-   manifest.xml
-   ```
-
-3. Sideload ke Word sesuai platform:
-   - Word desktop: gunakan shared folder catalog atau menu add-ins developer.
-   - Word web: upload manifest melalui Office Add-ins.
+2. Buka Microsoft Word.
+3. Masuk ke menu add-ins / sideload add-in sesuai platform.
+4. Pilih `manifest.xml`.
+5. Buka task pane **Jurnal AI Assistant**.
+6. Pilih teks di dokumen Word.
+7. Klik **Use Word Selection** atau kirim instruksi agent.
 
 ### Production
 
-Gunakan:
-
-```text
-manifest.production.xml
-```
-
-Pastikan semua URL `https://YOUR-VERCEL-DOMAIN.vercel.app` sudah diganti dengan domain Vercel asli.
+Gunakan `manifest.production.xml` setelah URL Vercel diganti ke domain production.
 
 ## 11. Push ke GitHub
 
@@ -242,116 +237,166 @@ git push -u origin main
 3. Import repository `jurnal-ai-assistant`.
 4. Framework preset: Vite.
 5. Build command:
-
    ```bash
    npm run build
    ```
-
 6. Output directory:
-
    ```text
    dist
    ```
-
 7. Tambahkan environment variables.
 8. Deploy.
 
 ## 13. Environment Variables di Vercel
 
-Isi di dashboard Vercel:
+Isi di menu **Project Settings → Environment Variables**:
 
 ```env
-AI_API_KEY=isi_api_key_anda
-AI_API_BASE_URL=https://api.openai.com/v1
-AI_MODEL=gpt-3.5-turbo
+AI_API_KEY=
+AI_API_BASE_URL=
+AI_MODEL=
 MAX_INPUT_CHARS=50000
 ALLOWED_ORIGIN=https://YOUR-VERCEL-DOMAIN.vercel.app
 ```
 
-Catatan keamanan:
+Catatan:
 
-- Jangan commit `.env`.
-- Jangan hardcode API key.
-- Jangan menaruh API key di frontend.
-- Jangan membagikan API key ke teman.
-- Jika API key bocor, segera rotate/regenerate API key.
+- Jangan commit file `.env`.
+- Jangan taruh API key di `src/`.
+- Jangan expose credential di HTML/JS frontend.
 
-## 14. Mengganti `manifest.production.xml` ke Domain Vercel
+## 14. Mengganti Manifest Production ke Domain Vercel
 
-Setelah deploy, ganti semua:
+Edit `manifest.production.xml`.
+
+Ganti:
 
 ```text
 https://YOUR-VERCEL-DOMAIN.vercel.app
 ```
 
-menjadi domain asli, contoh:
+menjadi domain Vercel Anda, contoh:
 
 ```text
 https://jurnal-ai-assistant.vercel.app
 ```
 
-Pastikan URL task pane dapat diakses:
+Pastikan bagian berikut mengarah ke URL production:
 
-```text
-https://jurnal-ai-assistant.vercel.app/src/taskpane/taskpane.html
-```
+- `SourceLocation`
+- icon assets
+- support URL jika diperlukan
 
 ## 15. Membagikan Add-in ke Teman
 
 1. Deploy project ke Vercel.
-2. Set environment variables di Vercel.
-3. Update `manifest.production.xml` dengan domain Vercel asli.
+2. Pastikan environment variables sudah benar.
+3. Update `manifest.production.xml` ke domain Vercel.
 4. Kirim file `manifest.production.xml` ke teman.
-5. Teman melakukan sideload manifest ke Microsoft Word.
+5. Teman melakukan sideload manifest di Microsoft Word.
+6. Semua request AI akan tetap melewati backend Vercel Anda.
 
-API key tetap aman karena hanya berada di backend Vercel Anda.
+Jika ingin membatasi akses, tambahkan autentikasi atau allowlist user di backend.
 
 ## 16. Catatan Keamanan API Key
 
-- Frontend hanya memanggil relative endpoint `/api/ai/*`.
-- API key hanya dibaca di backend dari environment variable.
-- Backend tidak mengirim API key ke client.
-- Backend tidak menampilkan stack trace ke frontend.
-- Hindari logging full text user di production.
-- Gunakan `ALLOWED_ORIGIN` di production untuk membatasi origin.
-- Pertimbangkan rate limit dan auth tambahan jika add-in dibagikan luas.
+- API key hanya berada di environment variable backend.
+- Frontend tidak menyimpan, menampilkan, atau mengirim API key.
+- `.env` masuk `.gitignore`.
+- Error backend dibuat aman agar tidak membocorkan stack trace.
+- Jangan log full text user di production.
+- Gunakan `ALLOWED_ORIGIN` untuk membatasi origin production.
+- Jika manifest dibagikan, siapa pun yang memiliki manifest bisa memakai endpoint Anda selama tidak ada auth tambahan.
 
 ## 17. Catatan Etika Akademik
 
-Add-in ini adalah alat bantu penulisan, bukan pengganti tanggung jawab akademik penulis.
+Add-in ini adalah alat bantu penulisan, bukan pengganti integritas akademik.
 
-Rekomendasi penggunaan:
+Jangan gunakan AI untuk:
 
-- Gunakan untuk memperbaiki kejelasan bahasa, struktur argumen, dan ringkasan.
-- Tetap verifikasi semua hasil AI.
-- Jangan menggunakan AI untuk membuat data, referensi, kutipan, atau klaim palsu.
-- Pastikan penggunaan AI sesuai kebijakan kampus, jurnal, atau institusi.
-- Jika diperlukan, nyatakan penggunaan AI secara transparan sesuai aturan publikasi.
+- Mengarang data.
+- Mengarang referensi.
+- Mengarang kutipan.
+- Mengarang hasil penelitian.
+- Menyembunyikan plagiarisme.
+- Membuat klaim yang tidak didukung bukti.
+
+Selalu verifikasi isi, data, metode, dan referensi sebelum naskah dikirim ke jurnal.
 
 ## 18. Future Improvement: Long Document Chunking
 
-Untuk MVP, add-in memproses selected text dalam satu request.
+Untuk MVP, teks terpilih diproses dalam satu request.
 
-Untuk dokumen panjang, teks sebaiknya diproses per paragraf atau per heading, bukan langsung mengirim seluruh dokumen dalam satu request. Chunking membantu:
+Untuk dokumen panjang, teks sebaiknya diproses per paragraf atau per heading. Jangan langsung mengirim seluruh dokumen dalam satu request.
 
-- Mengurangi risiko timeout.
+Chunking membantu:
+
+- Mengurangi timeout.
 - Menjaga kualitas output.
-- Memudahkan review perubahan.
-- Menghindari konteks terlalu panjang.
-- Memberikan kontrol granular kepada user.
+- Memudahkan review hasil.
+- Mengurangi risiko perubahan besar yang tidak terkontrol.
 
 Mode masa depan:
 
-1. Process selected paragraphs
-2. Process current section
-3. Process full document by chunks
-4. Review changes one by one
+1. Process selected paragraphs.
+2. Process current section.
+3. Process full document by chunks.
+4. Review changes one by one.
 
-## 19. Future Improvement Lainnya
+## 19. Future Improvement Lain
 
 - History hasil AI.
-- Mode komentar/review.
-- Sitasi dan referensi.
-- Multi-user auth.
-- Usage limit.
+- Mode komentar/review di margin dokumen.
+- Sitasi dan referensi dengan integrasi reference manager.
+- Multi-user authentication.
+- Usage limit per user.
 - Custom prompt profile.
+- Template jurnal per kampus/penerbit.
+- Export perubahan sebagai changelog revisi.
+
+## 20. Script Package
+
+```bash
+npm run dev
+npm run build
+npm run preview
+npm run typecheck
+npm run lint
+```
+
+## 21. Format AI API
+
+Backend menganggap AI API kompatibel dengan OpenAI Chat Completions:
+
+```http
+POST {AI_API_BASE_URL}/chat/completions
+Authorization: Bearer {AI_API_KEY}
+Content-Type: application/json
+```
+
+Body:
+
+```json
+{
+  "model": "AI_MODEL",
+  "messages": [
+    {
+      "role": "system",
+      "content": "systemPrompt"
+    },
+    {
+      "role": "user",
+      "content": "userText"
+    }
+  ],
+  "temperature": 0.3
+}
+```
+
+Backend mengambil hasil dari:
+
+```text
+data.choices[0].message.content
+```
+
+Jika format response berbeda atau kosong, backend mengembalikan error yang jelas.

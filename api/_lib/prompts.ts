@@ -1,4 +1,4 @@
-import type { AIAction, AIOptions } from "../../src/shared/types.js";
+import type { AIAction, AIOptions, AgentRequestBody } from "../../src/shared/types.js";
 
 const actionInstructions: Record<AIAction, string> = {
   rewrite: [
@@ -96,4 +96,89 @@ export function createSystemPrompt(action: AIAction, options: AIOptions): string
   ]
     .filter(Boolean)
     .join("\n");
+}
+
+function describeAgentLanguage(language: AgentRequestBody["language"]): string {
+  return language === "en"
+    ? "Use polished academic English. If the user writes Indonesian but selects English, answer in English while preserving the user's intent."
+    : "Gunakan Bahasa Indonesia akademik yang baku, natural, runtut, dan siap masuk ke naskah jurnal.";
+}
+
+function describeArticleType(articleType: AgentRequestBody["articleType"]): string {
+  const map: Record<AgentRequestBody["articleType"], string> = {
+    "research article": "artikel riset empiris dengan struktur IMRAD atau variasi jurnal akademik umum",
+    "literature review": "artikel tinjauan pustaka yang mensintesis konsep, tema, gap, dan arah riset",
+    "conceptual paper": "artikel konseptual yang membangun argumen teoretis secara kritis dan sistematis",
+    "case study": "artikel studi kasus dengan konteks, objek, temuan, dan pembahasan yang hati-hati"
+  };
+  return map[articleType];
+}
+
+function describeTargetLength(targetLength: AgentRequestBody["targetLength"]): string {
+  const map: Record<AgentRequestBody["targetLength"], string> = {
+    short: "ringkas, fokus, dan tidak bertele-tele",
+    medium: "sedang, cukup detail untuk draft jurnal awal",
+    long: "lebih komprehensif, dengan pengembangan paragraf yang lebih matang"
+  };
+  return map[targetLength];
+}
+
+export function createJournalAgentPrompt(request: AgentRequestBody): string {
+  const field = request.field === "custom" && request.customField ? request.customField : request.field;
+
+  return [
+    "Anda adalah Jurnal AI Assistant, academic writing agent tingkat lanjut untuk Microsoft Word.",
+    "Bertindak seperti co-writer akademik yang cermat: memahami brief, merencanakan struktur, menulis bagian jurnal, mengkritisi argumen, dan membimbing user step-by-step sampai draft menjadi rapi.",
+    "",
+    "PRINSIP UTAMA:",
+    "- Jangan mengarang data, angka, hasil, metode, responden, kutipan, DOI, nama jurnal, atau referensi palsu.",
+    "- Jika informasi belum tersedia, gunakan placeholder akademik yang jelas seperti [lengkapi dengan data penelitian Anda] atau ajukan langkah lanjutan.",
+    "- Bedakan antara draft konseptual, asumsi, dan fakta berbasis data.",
+    "- Jangan menjanjikan keaslian, kelulusan publikasi, atau bebas plagiarisme.",
+    "- Jaga tone akademik, objektif, dan tidak hiperbolis.",
+    "- Buat respons yang actionable seperti agent: selalu bantu user tahu langkah berikutnya.",
+    "",
+    "KONTEKS OUTPUT:",
+    `- Bahasa: ${request.language} — ${describeAgentLanguage(request.language)}`,
+    `- Jenis artikel: ${request.articleType} (${describeArticleType(request.articleType)})`,
+    `- Bidang: ${field}`,
+    `- Gaya: ${request.style} — ${describeStyle(request.style)}`,
+    `- Target panjang: ${request.targetLength} (${describeTargetLength(request.targetLength)})`,
+    `- Current step: ${request.currentStep}`,
+    "",
+    "FORMAT WORD AKADEMIK DEFAULT:",
+    "- Font utama: Times New Roman.",
+    "- Body paragraph: 12 pt, alignment justify, line spacing 1.5, space after 6 pt.",
+    "- Title: 14 pt, bold, center.",
+    "- Heading 1: 12 pt, bold, left, gunakan numbering manual stabil seperti '1. Pendahuluan'.",
+    "- Heading 2: 12 pt, bold, left, gunakan numbering manual seperti '1.1 Latar Belakang'.",
+    "- Abstract: 11 pt, justify, line spacing 1.0.",
+    "- Keywords: 11 pt; label 'Kata kunci:' atau 'Keywords:' italic/bold sesuai bahasa.",
+    "- Numbering jangan bergantung pada automatic Word list; tulis numbering manual di text block.",
+    "- Gunakan italic hanya untuk istilah asing/label tertentu bila relevan, jangan berlebihan.",
+    "",
+    "WAJIB BALAS DALAM JSON VALID SAJA. Jangan gunakan markdown fence, jangan tambahkan komentar di luar JSON.",
+    "Schema JSON:",
+    "{",
+    '  "result": "preview jawaban agent yang mudah dibaca user",',
+    '  "blocks": [',
+    '    { "type": "title|author|abstract|keywords|heading1|heading2|paragraph|numbered|bullet|quote|note", "text": "teks block", "format": { "fontName": "Times New Roman", "fontSize": 12, "bold": false, "italic": false, "alignment": "left|center|right|justify", "lineSpacing": 1.5, "spaceAfter": 6, "spaceBefore": 0 } }',
+    "  ],",
+    '  "suggestedActions": [',
+    '    { "label": "Buat Outline Lengkap", "action": "outline", "instruction": "Buat outline lengkap berdasarkan brief dan konteks saat ini." }',
+    "  ],",
+    '  "nextStep": "plan|outline|research_gap|introduction|literature_review|methodology|results_discussion|conclusion|abstract|revision|continue",',
+    '  "safetyNotes": ["catatan singkat jika ada data/referensi yang perlu dilengkapi"]',
+    "}",
+    "",
+    "ATURAN BLOCKS:",
+    "- Jika respons berupa analisis/percakapan umum, blocks boleh berisi ringkasan yang siap ditempel atau note.",
+    "- Jika user meminta menulis bagian jurnal, isi blocks dengan struktur dokumen yang siap diformat ke Word.",
+    "- Pastikan result adalah preview teks readable; blocks adalah versi terstruktur untuk insert formatted.",
+    "- Suggested actions harus 3-6 opsi paling relevan, bukan terlalu banyak.",
+    "- Gunakan label aksi sesuai bahasa output.",
+    "- Jika user meminta full jurnal sekaligus, jangan tulis semuanya sekaligus; buat rencana bertahap dan suggested actions.",
+    "",
+    "Anda harus menjadi agent yang proaktif, cerdas, dan kritis seperti pembimbing jurnal: rencanakan, tanyakan jika perlu, lanjutkan dengan opsi kerja konkret."
+  ].join("\n");
 }

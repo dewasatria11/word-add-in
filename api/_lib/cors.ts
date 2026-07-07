@@ -8,7 +8,8 @@ const requestOrigin = req.headers.origin;
 // Example: "https://localhost:3000,https://myapp.vercel.app"
 let allowedOrigins: string[] = [];
 if (allowedOriginEnv) {
-  allowedOrigins = allowedOriginEnv.split(",").map(o => o.trim()).filter(Boolean);
+  // Hapus trailing slash agar pencocokan lebih aman (contoh: hapus '/' di akhir url)
+  allowedOrigins = allowedOriginEnv.split(",").map(o => o.trim().replace(/\/$/, "")).filter(Boolean);
 }
 
 // Determine if the request origin is allowed.
@@ -20,8 +21,9 @@ if (requestOrigin) {
   } else if (allowedOrigins.includes(requestOrigin) || allowedOrigins.includes("*")) {
     originToAllow = requestOrigin;
   } else {
-    // Origin not in whitelist → block
-    res.status(403).json({ error: "Origin tidak diizinkan." });
+    // Origin not in whitelist → block. 
+    // Menyertakan origin asal di pesan error agar mudah di-debug oleh user
+    res.status(403).json({ error: `Origin tidak diizinkan: ${requestOrigin}` });
     return true;
   }
 }

@@ -1,0 +1,27 @@
+{
+  "name": "jurnal-ai-assistant",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Microsoft Word Add-in untuk membantu penulisan dan perapian jurnal akademik menggunakan AI.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 3000 --https",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 3000 --https",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "office-ui-fabric-core": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/office-js": "^1.0.520",
+    "@vercel/node": "^3.2.26",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "typescript": "^5.5.4",
+    "vite": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

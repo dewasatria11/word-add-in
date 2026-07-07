@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jurnal AI Assistant</title>
+    <!-- Office.js library -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+    <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.1.0/css/fabric.min.css">
+    <link rel="stylesheet" href="taskpane.css">
+</head>
+<body class="ms-font-m ms-welcome ms-Fabric">
+    <header class="app-header">
+        <div class="header-title-container">
+            <h1 class="ms-font-xxl header-title">Jurnal AI Assistant</h1>
+            <span class="badge">Academic Writing AI</span>
+        </div>
+        <p class="ms-font-s header-desc">Pilih teks di dokumen Word, lalu gunakan AI untuk membantu menulis, merapikan, dan menyusun jurnal akademik.</p>
+    </header>
+
+    <main class="app-body">
+        <!-- Configuration Section -->
+        <section class="section card">
+            <h2 class="ms-font-m section-title">Konfigurasi</h2>
+            
+            <div class="form-group">
+                <label for="select-language" class="ms-font-s form-label">Bahasa Output</label>
+                <select id="select-language" class="form-control">
+                    <option value="id" selected>Indonesia</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="select-style" class="ms-font-s form-label">Gaya Penulisan</label>
+                <select id="select-style" class="form-control">
+                    <option value="academic journal" selected>Academic Journal</option>
+                    <option value="formal">Formal</option>
+                    <option value="concise">Concise</option>
+                    <option value="critical review">Critical Review</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="input-instructions" class="ms-font-s form-label">Instruksi Tambahan (Opsional)</label>
+                <textarea id="input-instructions" class="form-control text-area-inst" placeholder="Contoh: buat lebih formal, jangan terlalu panjang, pertahankan istilah teknis"></textarea>
+            </div>
+            
+            <div class="selected-text-info">
+                <span class="ms-font-s text-muted">Karakter Terpilih: <strong id="char-counter">0</strong></span>
+                <div id="length-warning" class="warning-banner ms-font-xs hidden">
+                    Warning: Teks sangat panjang (> 5,000 karakter). Proses mungkin memakan waktu lebih lama.
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Actions Section -->
+        <section class="section">
+            <h2 class="ms-font-m section-title">Aksi AI</h2>
+            <div class="actions-grid">
+                <button id="btn-rewrite" class="action-btn" data-action="rewrite">
+                    <i class="ms-Icon ms-Icon--Edit" aria-hidden="true"></i> Rapikan Bahasa
+                </button>
+                <button id="btn-paraphrase" class="action-btn" data-action="paraphrase">
+                    <i class="ms-Icon ms-Icon--Sync" aria-hidden="true"></i> Parafrase
+                </button>
+                <button id="btn-abstract" class="action-btn" data-action="abstract">
+                    <i class="ms-Icon ms-Icon--Document" aria-hidden="true"></i> Buat Abstrak
+                </button>
+                <button id="btn-outline" class="action-btn" data-action="outline">
+                    <i class="ms-Icon ms-Icon--BulletedList" aria-hidden="true"></i> Outline Jurnal
+                </button>
+                <button id="btn-improve-argument" class="action-btn" data-action="improve-argument">
+                    <i class="ms-Icon ms-Icon--Like" aria-hidden="true"></i> Perkuat Argumen
+                </button>
+                <button id="btn-summarize" class="action-btn" data-action="summarize">
+                    <i class="ms-Icon ms-Icon--Product" aria-hidden="true"></i> Ringkas Teks
+                </button>
+            </div>
+        </section>
+
+        <!-- Status Messages -->
+        <div id="status-container" class="status-container">
+            <div id="loading-state" class="loading-state hidden">
+                <div class="spinner"></div>
+                <span class="ms-font-s">Memproses dengan AI...</span>
+            </div>
+            <div id="error-message" class="error-banner hidden"></div>
+            <div id="success-message" class="success-banner hidden"></div>
+        </div>
+
+        <!-- Result Preview Section -->
+        <section class="section card">
+            <div class="section-header-row">
+                <h2 class="ms-font-m section-title">Preview Hasil AI</h2>
+                <button id="btn-clear" class="text-btn ms-font-s" title="Bersihkan hasil">Clear</button>
+            </div>
+            <textarea id="result-preview" class="form-control preview-box" readonly placeholder="Hasil pemrosesan AI akan tampil di sini..."></textarea>
+
+            <div class="document-actions">
+                <button id="btn-replace" class="doc-btn primary-btn" disabled>
+                    <i class="ms-Icon ms-Icon--PageLink" aria-hidden="true"></i> Replace Selected
+                </button>
+                <button id="btn-insert" class="doc-btn secondary-btn" disabled>
+                    <i class="ms-Icon ms-Icon--Download" aria-hidden="true"></i> Insert Below
+                </button>
+                <button id="btn-copy" class="doc-btn secondary-btn" disabled>
+                    <i class="ms-Icon ms-Icon--Copy" aria-hidden="true"></i> Copy Result
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p class="ms-font-xs text-muted">Jurnal AI Assistant &copy; 2026. Mode Offline & Secure.</p>
+    </footer>
+
+    <script type="module" src="taskpane.ts"></script>
+</body>
+</html>

@@ -33,6 +33,8 @@ const errorMessage = document.getElementById("error-message") as HTMLElement;
 const successMessage = document.getElementById("success-message") as HTMLElement;
 
 const resultPreview = document.getElementById("result-preview") as HTMLTextAreaElement;
+const emptyState = document.getElementById("empty-state") as HTMLElement;
+const previewLoading = document.getElementById("preview-loading") as HTMLElement;
 
 const btnRewrite = document.getElementById("btn-rewrite") as HTMLButtonElement;
 const btnParaphrase = document.getElementById("btn-paraphrase") as HTMLButtonElement;
@@ -89,7 +91,7 @@ async function handleActionClick(event: Event): Promise<void> {
 
   selectedText = text;
   charCounter.textContent = selectedText.length.toLocaleString();
-  lengthWarning.classList.toggle("hidden", selectedText.length <= 5000);
+  lengthWarning.classList.toggle("hidden", selectedText.length <= 20000);
 
   // Step 2: Build options from current configuration
   const language = selectLanguage.value as AILanguage;
@@ -218,6 +220,8 @@ async function handleCopyResult(): Promise<void> {
 function handleClear(): void {
   result = "";
   resultPreview.value = "";
+  resultPreview.classList.add("hidden");
+  emptyState.classList.remove("hidden");
   selectedText = "";
   charCounter.textContent = "0";
   lengthWarning.classList.add("hidden");
@@ -270,6 +274,22 @@ function setLoading(isLoading: boolean): void {
 
   // Show/hide loading spinner
   loadingState.classList.toggle("hidden", !isLoading);
+
+  // Handle preview area states
+  if (isLoading) {
+    emptyState.classList.add("hidden");
+    resultPreview.classList.add("hidden");
+    previewLoading.classList.remove("hidden");
+  } else {
+    previewLoading.classList.add("hidden");
+    if (result) {
+      emptyState.classList.add("hidden");
+      resultPreview.classList.remove("hidden");
+    } else {
+      emptyState.classList.remove("hidden");
+      resultPreview.classList.add("hidden");
+    }
+  }
 
   // Disable all action buttons while loading
   allActionBtns.forEach((btn) => {

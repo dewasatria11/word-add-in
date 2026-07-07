@@ -4,116 +4,182 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jurnal AI Assistant</title>
-    <!-- Office.js library -->
     <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
     <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.1.0/css/fabric.min.css">
     <link rel="stylesheet" href="taskpane.css">
 </head>
-<body class="ms-font-m ms-welcome ms-Fabric">
-    <header class="app-header">
-        <div class="header-title-container">
-            <h1 class="ms-font-xxl header-title">Jurnal AI Assistant</h1>
-            <span class="badge">Academic Writing AI</span>
-        </div>
-        <p class="ms-font-s header-desc">Pilih teks di dokumen Word, lalu gunakan AI untuk membantu menulis, merapikan, dan menyusun jurnal akademik.</p>
-    </header>
-
-    <main class="app-body">
-        <!-- Configuration Section -->
-        <section class="section card">
-            <h2 class="ms-font-m section-title">Konfigurasi</h2>
-            
-            <div class="form-group">
-                <label for="select-language" class="ms-font-s form-label">Bahasa Output</label>
-                <select id="select-language" class="form-control">
-                    <option value="id" selected>Indonesia</option>
-                    <option value="en">English</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="select-style" class="ms-font-s form-label">Gaya Penulisan</label>
-                <select id="select-style" class="form-control">
-                    <option value="academic journal" selected>Academic Journal</option>
-                    <option value="formal">Formal</option>
-                    <option value="concise">Concise</option>
-                    <option value="critical review">Critical Review</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="input-instructions" class="ms-font-s form-label">Instruksi Tambahan (Opsional)</label>
-                <textarea id="input-instructions" class="form-control text-area-inst" placeholder="Contoh: buat lebih formal, jangan terlalu panjang, pertahankan istilah teknis"></textarea>
-            </div>
-            
-            <div class="selected-text-info">
-                <span class="ms-font-s text-muted">Karakter Terpilih: <strong id="char-counter">0</strong></span>
-                <div id="length-warning" class="warning-banner ms-font-xs hidden">
-                    Warning: Teks sangat panjang (> 5,000 karakter). Proses mungkin memakan waktu lebih lama.
+<body class="ms-Fabric">
+    <div class="app-shell">
+        <header class="app-header">
+            <div class="brand-row">
+                <div class="brand-mark" aria-hidden="true">JA</div>
+                <div class="brand-copy">
+                    <div class="title-row">
+                        <h1>Jurnal AI Assistant</h1>
+                        <span class="badge">Academic Writing AI</span>
+                    </div>
+                    <p>Pilih teks di Word, lalu rapikan, parafrase, susun outline, atau buat ringkasan dengan kontrol penuh sebelum masuk ke dokumen.</p>
                 </div>
             </div>
-        </section>
+        </header>
 
-        <!-- AI Actions Section -->
-        <section class="section">
-            <h2 class="ms-font-m section-title">Aksi AI</h2>
-            <div class="actions-grid">
-                <button id="btn-rewrite" class="action-btn" data-action="rewrite">
-                    <i class="ms-Icon ms-Icon--Edit" aria-hidden="true"></i> Rapikan Bahasa
-                </button>
-                <button id="btn-paraphrase" class="action-btn" data-action="paraphrase">
-                    <i class="ms-Icon ms-Icon--Sync" aria-hidden="true"></i> Parafrase
-                </button>
-                <button id="btn-abstract" class="action-btn" data-action="abstract">
-                    <i class="ms-Icon ms-Icon--Document" aria-hidden="true"></i> Buat Abstrak
-                </button>
-                <button id="btn-outline" class="action-btn" data-action="outline">
-                    <i class="ms-Icon ms-Icon--BulletedList" aria-hidden="true"></i> Outline Jurnal
-                </button>
-                <button id="btn-improve-argument" class="action-btn" data-action="improve-argument">
-                    <i class="ms-Icon ms-Icon--Like" aria-hidden="true"></i> Perkuat Argumen
-                </button>
-                <button id="btn-summarize" class="action-btn" data-action="summarize">
-                    <i class="ms-Icon ms-Icon--Product" aria-hidden="true"></i> Ringkas Teks
-                </button>
+        <main class="app-body">
+            <section class="card config-card" aria-labelledby="config-title">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Step 1</p>
+                        <h2 id="config-title">Atur preferensi output</h2>
+                    </div>
+                    <span class="mini-pill">Secure API</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="select-language">Bahasa Output</label>
+                        <select id="select-language" class="form-control">
+                            <option value="id" selected>Indonesia</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="select-style">Gaya Penulisan</label>
+                        <select id="select-style" class="form-control">
+                            <option value="academic journal" selected>Academic Journal</option>
+                            <option value="formal">Formal</option>
+                            <option value="concise">Concise</option>
+                            <option value="critical review">Critical Review</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="input-instructions">Instruksi Tambahan <span>(opsional)</span></label>
+                    <textarea id="input-instructions" class="form-control text-area-inst" placeholder="Contoh: buat lebih formal, jangan terlalu panjang, pertahankan istilah teknis"></textarea>
+                    <p class="helper-text">Tambahkan arahan spesifik agar hasil AI sesuai kebutuhan jurnal Anda.</p>
+                </div>
+
+                <div class="insight-bar">
+                    <div>
+                        <span class="counter-label">Selected text</span>
+                        <strong><span id="char-counter">0</span> karakter</strong>
+                    </div>
+                    <div class="counter-hint">AI hanya memproses teks yang sedang dipilih di dokumen Word.</div>
+                </div>
+
+                <div id="length-warning" class="warning-banner hidden" role="status">
+                    <strong>Teks sangat panjang.</strong> Selected text lebih dari 20.000 karakter. Untuk hasil lebih stabil, pertimbangkan memproses per bagian atau per paragraf.
+                </div>
+            </section>
+
+            <section class="card" aria-labelledby="actions-title">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Step 2</p>
+                        <h2 id="actions-title">Pilih aksi AI</h2>
+                    </div>
+                </div>
+
+                <div class="actions-grid">
+                    <button id="btn-rewrite" class="action-btn" data-action="rewrite">
+                        <span class="action-icon ms-Icon ms-Icon--Edit" aria-hidden="true"></span>
+                        <span class="action-copy">
+                            <strong>Rapikan Bahasa</strong>
+                            <small>Lebih formal, runtut, dan akademik.</small>
+                        </span>
+                    </button>
+                    <button id="btn-paraphrase" class="action-btn" data-action="paraphrase">
+                        <span class="action-icon ms-Icon ms-Icon--Sync" aria-hidden="true"></span>
+                        <span class="action-copy">
+                            <strong>Parafrase</strong>
+                            <small>Ubah diksi tanpa mengubah makna.</small>
+                        </span>
+                    </button>
+                    <button id="btn-abstract" class="action-btn" data-action="abstract">
+                        <span class="action-icon ms-Icon ms-Icon--Document" aria-hidden="true"></span>
+                        <span class="action-copy">
+                            <strong>Buat Abstrak</strong>
+                            <small>Susun abstrak dari informasi tersedia.</small>
+                        </span>
+                    </button>
+                    <button id="btn-outline" class="action-btn" data-action="outline">
+                        <span class="action-icon ms-Icon ms-Icon--BulletedList" aria-hidden="true"></span>
+                        <span class="action-copy">
+                            <strong>Outline Jurnal</strong>
+                            <small>Buat kerangka artikel akademik.</small>
+                        </span>
+                    </button>
+                    <button id="btn-improve-argument" class="action-btn" data-action="improve-argument">
+                        <span class="action-icon ms-Icon ms-Icon--Like" aria-hidden="true"></span>
+                        <span class="action-copy">
+                            <strong>Perkuat Argumen</strong>
+                            <small>Perjelas transisi dan alur logika.</small>
+                        </span>
+                    </button>
+                    <button id="btn-summarize" class="action-btn" data-action="summarize">
+                        <span class="action-icon ms-Icon ms-Icon--Product" aria-hidden="true"></span>
+                        <span class="action-copy">
+                            <strong>Ringkas Teks</strong>
+                            <small>Padatkan tanpa informasi baru.</small>
+                        </span>
+                    </button>
+                </div>
+            </section>
+
+            <div id="status-container" class="status-container" aria-live="polite">
+                <div id="loading-state" class="loading-state hidden">
+                    <div class="spinner" aria-hidden="true"></div>
+                    <div>
+                        <strong>AI sedang memproses teks...</strong>
+                        <span>Jangan tutup task pane sampai hasil selesai dibuat.</span>
+                    </div>
+                </div>
+                <div id="error-message" class="error-banner hidden"></div>
+                <div id="success-message" class="success-banner hidden"></div>
             </div>
-        </section>
 
-        <!-- Status Messages -->
-        <div id="status-container" class="status-container">
-            <div id="loading-state" class="loading-state hidden">
-                <div class="spinner"></div>
-                <span class="ms-font-s">Memproses dengan AI...</span>
-            </div>
-            <div id="error-message" class="error-banner hidden"></div>
-            <div id="success-message" class="success-banner hidden"></div>
-        </div>
+            <section class="card result-card" aria-labelledby="result-title">
+                <div class="section-heading result-heading">
+                    <div>
+                        <p class="eyebrow">Step 3</p>
+                        <h2 id="result-title">Preview hasil AI</h2>
+                    </div>
+                    <button id="btn-clear" class="text-btn" title="Bersihkan hasil">Clear</button>
+                </div>
 
-        <!-- Result Preview Section -->
-        <section class="section card">
-            <div class="section-header-row">
-                <h2 class="ms-font-m section-title">Preview Hasil AI</h2>
-                <button id="btn-clear" class="text-btn ms-font-s" title="Bersihkan hasil">Clear</button>
-            </div>
-            <textarea id="result-preview" class="form-control preview-box" readonly placeholder="Hasil pemrosesan AI akan tampil di sini..."></textarea>
+                <div id="empty-state" class="empty-state">
+                    <div class="empty-icon" aria-hidden="true">✦</div>
+                    <h3>Belum ada hasil AI</h3>
+                    <p>Pilih teks di dokumen Word, pilih aksi AI, lalu review hasilnya di sini sebelum mengganti atau menyisipkan ke dokumen.</p>
+                </div>
 
-            <div class="document-actions">
-                <button id="btn-replace" class="doc-btn primary-btn" disabled>
-                    <i class="ms-Icon ms-Icon--PageLink" aria-hidden="true"></i> Replace Selected
-                </button>
-                <button id="btn-insert" class="doc-btn secondary-btn" disabled>
-                    <i class="ms-Icon ms-Icon--Download" aria-hidden="true"></i> Insert Below
-                </button>
-                <button id="btn-copy" class="doc-btn secondary-btn" disabled>
-                    <i class="ms-Icon ms-Icon--Copy" aria-hidden="true"></i> Copy Result
-                </button>
-            </div>
-        </section>
-    </main>
+                <div id="preview-loading" class="preview-skeleton hidden" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span class="short"></span>
+                </div>
 
-    <footer class="app-footer">
-        <p class="ms-font-xs text-muted">Jurnal AI Assistant &copy; 2026. Mode Offline & Secure.</p>
-    </footer>
+                <textarea id="result-preview" class="form-control preview-box hidden" readonly placeholder="Hasil pemrosesan AI akan tampil di sini..."></textarea>
+
+                <div class="document-actions">
+                    <button id="btn-replace" class="doc-btn primary-btn" disabled>
+                        <span class="ms-Icon ms-Icon--PageLink" aria-hidden="true"></span> Replace Selected Text
+                    </button>
+                    <button id="btn-insert" class="doc-btn secondary-btn" disabled>
+                        <span class="ms-Icon ms-Icon--Download" aria-hidden="true"></span> Insert Below Selection
+                    </button>
+                    <button id="btn-copy" class="doc-btn secondary-btn" disabled>
+                        <span class="ms-Icon ms-Icon--Copy" aria-hidden="true"></span> Copy Result
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>Jurnal AI Assistant · API key aman di backend · Review hasil sebelum digunakan</p>
+        </footer>
+    </div>
 
     <script type="module" src="taskpane.ts"></script>
 </body>

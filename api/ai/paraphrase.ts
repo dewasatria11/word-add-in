@@ -1,30 +1,18 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { applyCors } from "../_lib/cors.js";
-import { validateAIRequest, ValidationError } from "../_lib/validateRequest.js";
-import { callAI, AIServiceError } from "../_lib/callAI.js";
-import { sendError, sendJson, getSafeErrorMessage } from "../_lib/response.js";
-import type { AIRequestBody, AISuccessResponse } from "../../src/shared/types.js";
+import { callParaphraseAI, AIServiceError } from "../_lib/callAI.js";
+import { sendError, sendJson } from "../_lib/response.js";
+import { validateParaphraseRequest, ValidationError } from "../_lib/validateAnalysisRequest.js";
 
-export default async function (req: VercelRequest, res: VercelResponse): Promise<void> {
-  if (applyCors(req, res)) {
-    return;
-  }
-
-  let requestBody: AIRequestBody;
+export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
+  if (applyCors(req, res)) return;
   try {
-    requestBody = validateAIRequest(req);
-  } catch (error: unknown) {
-    const message = getSafeErrorMessage(error);
-    const statusCode = error instanceof ValidationError ? error.statusCode : 400;
-    return sendError(res, statusCode, message);
-  }
-
-  try {
-    const result = await callAI("paraphrase", requestBody);
-    sendJson<AISuccessResponse>(res, 200, { result });
-  } catch (error: unknown) {
-    const message = getSafeErrorMessage(error);
-    const statusCode = error instanceof AIServiceError ? 502 : 500;
-    sendError(res, statusCode, message);
+    const request = validateParaphraseRequest(req);
+    const result = await callParaphraseAI(request);
+    sendJson(res, 200, { result });
+  } catch (error) {
+    if (error instanceof ValidationError) return sendError(res, error.statusCode, error.message);
+    if (error instanceof AIServiceError) return sendError(res, 502, error.message);
+    return sendError(res, 500, "Gagal memproses parafrase secara aman.");
   }
 }

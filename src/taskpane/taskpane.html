@@ -18,9 +18,9 @@
                 <div>
                     <div class="title-line">
                         <h1>Jurnal AI Assistant</h1>
-                        <span class="premium-badge">Academic Agent</span>
+                        <span class="premium-badge">Academic Integrity</span>
                     </div>
-                    <p>Co-writer akademik untuk merencanakan, menulis, merevisi, dan memformat draft jurnal langsung dari Microsoft Word.</p>
+                    <p>Co-writer akademik untuk menganalisis orisinalitas, risiko AI, dan melakukan parafrase naskah Anda.</p>
                 </div>
             </div>
 
@@ -30,22 +30,23 @@
                     <strong><span id="char-counter">0</span> chars</strong>
                 </div>
                 <div>
-                    <span>Session</span>
-                    <strong><span id="turn-counter">0</span> turns</strong>
+                    <span>Full Doc</span>
+                    <strong><span id="full-doc-counter">0</span> chars</strong>
                 </div>
             </div>
         </header>
 
         <main class="workspace">
-            <section class="panel config-panel" aria-label="Konfigurasi agent">
+            <!-- KONFIGURASI PARAPHRASE / WORKSPACE -->
+            <section class="panel config-panel" aria-label="Konfigurasi">
                 <div class="panel-title">
                     <span class="dot"></span>
-                    <h2>Journal Setup</h2>
+                    <h2>General Setup</h2>
                 </div>
 
                 <div class="config-grid">
                     <label>
-                        <span>Bahasa</span>
+                        <span>Bahasa Target / Analisis</span>
                         <select id="select-language">
                             <option value="id" selected>Indonesia</option>
                             <option value="en">English</option>
@@ -53,134 +54,105 @@
                     </label>
 
                     <label>
-                        <span>Jenis Artikel</span>
-                        <select id="select-article-type">
-                            <option value="research article" selected>Research Article</option>
-                            <option value="literature review">Literature Review</option>
-                            <option value="conceptual paper">Conceptual Paper</option>
-                            <option value="case study">Case Study</option>
-                        </select>
-                    </label>
-
-                    <label>
-                        <span>Bidang</span>
-                        <select id="select-field">
-                            <option value="education" selected>Education</option>
-                            <option value="technology">Technology</option>
-                            <option value="health">Health</option>
-                            <option value="social">Social</option>
-                            <option value="economics">Economics</option>
-                            <option value="law">Law</option>
-                            <option value="custom">Custom</option>
-                        </select>
-                    </label>
-
-                    <label id="custom-field-wrap" class="hidden">
-                        <span>Bidang Custom</span>
-                        <input id="input-custom-field" type="text" placeholder="Contoh: linguistik terapan" />
-                    </label>
-
-                    <label>
-                        <span>Gaya</span>
+                        <span>Gaya Parafrase</span>
                         <select id="select-style">
-                            <option value="academic journal" selected>Academic Journal</option>
+                            <option value="academic" selected>Academic Style</option>
                             <option value="formal">Formal</option>
                             <option value="concise">Concise</option>
-                            <option value="critical review">Critical Review</option>
+                            <option value="natural">Natural</option>
                         </select>
                     </label>
+                </div>
 
+                <div class="instruction-wrap">
                     <label>
-                        <span>Panjang</span>
-                        <select id="select-target-length">
-                            <option value="short">Short</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="long">Long</option>
-                        </select>
+                        <span>Instruksi Tambahan (Opsional)</span>
+                        <input id="input-instructions" type="text" placeholder="Contoh: pertahankan istilah medis, buat lebih formal..." />
                     </label>
                 </div>
 
                 <div class="warning-banner hidden" id="length-warning">
-                    Teks terpilih sangat panjang. Untuk kualitas lebih stabil, proses per bagian atau per heading.
+                    Teks sangat panjang! Disarankan menganalisis per bagian agar hasil tetap akurat.
                 </div>
             </section>
 
-            <section class="panel chat-panel" aria-label="Percakapan agent">
-                <div class="chat-header">
-                    <div>
-                        <p class="eyebrow">Agent workflow</p>
-                        <h2>Tulis jurnal dengan arahan bertahap</h2>
-                    </div>
-                    <button id="btn-new-session" class="ghost-btn" type="button">New Session</button>
-                </div>
-
-                <div id="chat-log" class="chat-log" aria-live="polite">
-                    <article class="message assistant-message">
-                        <div class="avatar">AI</div>
-                        <div class="bubble">
-                            <strong>Mulai dari brief singkat.</strong>
-                            <p>Saya bisa membuat rencana jurnal, outline, research gap, pendahuluan, metodologi, pembahasan, abstrak, atau merevisi teks yang Anda pilih di Word.</p>
+            <!-- KARTU UTAMA FITUR -->
+            <section class="panel tools-panel" aria-label="Menu Fitur">
+                <div class="tool-cards">
+                    <div class="tool-card">
+                        <div class="tool-icon">🔍</div>
+                        <div class="tool-info">
+                            <h3>Check Similarity</h3>
+                            <p>Mengecek kemiripan naskah internal & eksternal jurnal.</p>
                         </div>
-                    </article>
+                        <button id="btn-similarity" class="tool-btn">Scan Similarity</button>
+                    </div>
+
+                    <div class="tool-card">
+                        <div class="tool-icon">🤖</div>
+                        <div class="tool-info">
+                            <h3>AI Writing Detector</h3>
+                            <p>Analisis probabilistik risiko naskah yang digenerate AI.</p>
+                        </div>
+                        <button id="btn-detector" class="tool-btn">Analyze AI Risk</button>
+                    </div>
+
+                    <div class="tool-card">
+                        <div class="tool-icon">✍️</div>
+                        <div class="tool-info">
+                            <h3>Paraphrase Selected</h3>
+                            <p>Parafrase teks yang Anda sorot di Word secara aman.</p>
+                        </div>
+                        <button id="btn-paraphrase" class="tool-btn">Paraphrase Text</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AREA HASIL PREVIEW / LAPORAN -->
+            <section class="panel preview-panel" aria-label="Hasil Analisis">
+                <div class="preview-header">
+                    <div>
+                        <p class="eyebrow">Result pane</p>
+                        <h2>Preview & Report</h2>
+                    </div>
+                    <button id="btn-clear" class="ghost-btn" type="button">Clear</button>
                 </div>
 
-                <div id="suggestions" class="suggestions">
-                    <button data-prompt="Bantu saya membuat rencana artikel jurnal dari topik ini. Gunakan teks yang saya pilih sebagai konteks bila ada.">Buat rencana jurnal</button>
-                    <button data-prompt="Buat outline artikel jurnal yang lengkap dan realistis.">Buat outline</button>
-                    <button data-prompt="Analisis research gap dan rumusan masalah dari konteks ini.">Cari research gap</button>
-                    <button data-prompt="Revisi teks yang saya pilih agar lebih siap sebagai naskah jurnal akademik.">Revisi seleksi Word</button>
-                </div>
-
-                <div id="status-container" class="status-container" aria-live="polite">
+                <div id="status-container" class="status-container">
                     <div id="loading-state" class="loading-state hidden">
                         <span class="spinner"></span>
-                        <span>Agent sedang menyusun respons akademik...</span>
+                        <span id="loading-text">Sedang memproses...</span>
                     </div>
                     <div id="error-message" class="error-banner hidden"></div>
                     <div id="success-message" class="success-banner hidden"></div>
                 </div>
 
-                <div class="composer">
-                    <textarea id="agent-input" placeholder="Contoh: Buat pendahuluan 4 paragraf tentang pengaruh AI terhadap literasi akademik mahasiswa. Gunakan gaya jurnal Sinta, jangan buat referensi palsu."></textarea>
-                    <div class="composer-actions">
-                        <button id="btn-use-selection" class="ghost-btn" type="button">Use Word Selection</button>
-                        <button id="btn-send" class="send-btn" type="button">Send</button>
-                    </div>
-                </div>
-            </section>
-
-            <section class="panel preview-panel" aria-label="Preview hasil">
-                <div class="preview-header">
-                    <div>
-                        <p class="eyebrow">Structured preview</p>
-                        <h2>Preview & Word Formatting</h2>
-                    </div>
-                    <button id="btn-clear" class="ghost-btn" type="button">Clear</button>
-                </div>
-
+                <!-- Empty State -->
                 <div id="empty-state" class="empty-state">
                     <div class="empty-symbol">✦</div>
                     <h3>Belum ada hasil</h3>
-                    <p>Respons agent akan tampil di sini sebagai preview. Anda tetap mengontrol kapan teks masuk ke dokumen.</p>
+                    <p>Silakan gunakan salah satu fitur di atas. Laporan analisis atau hasil parafrase Anda akan tampil di sini.</p>
                 </div>
 
-                <div id="result-preview" class="result-preview hidden"></div>
+                <!-- Report Render Area (Printable) -->
+                <div id="report-view" class="report-view hidden"></div>
 
-                <div id="safety-notes" class="safety-notes hidden"></div>
-
-                <div class="sticky-toolbar">
-                    <button id="btn-insert-formatted" class="primary-btn" disabled>Insert Formatted</button>
-                    <button id="btn-replace" class="secondary-btn" disabled>Replace Selection</button>
-                    <button id="btn-insert" class="secondary-btn" disabled>Insert Plain</button>
-                    <button id="btn-copy" class="secondary-btn" disabled>Copy</button>
+                <!-- Text Preview Area (Untuk Paraphrase) -->
+                <div id="text-preview-wrap" class="text-preview-wrap hidden">
+                    <textarea id="text-preview" readonly></textarea>
+                    <div class="sticky-toolbar">
+                        <button id="btn-replace" class="primary-btn">Replace Selection</button>
+                        <button id="btn-insert" class="secondary-btn">Insert Below</button>
+                        <button id="btn-copy" class="secondary-btn">Copy</button>
+                    </div>
                 </div>
             </section>
         </main>
 
         <footer class="footer">
-            <span>API key aman di backend</span>
+            <span>Orisinalitas Terjaga</span>
             <span>•</span>
-            <span>AI tidak boleh digunakan untuk fabrikasi data/referensi</span>
+            <span>API Key Aman di Vercel</span>
         </footer>
     </div>
 

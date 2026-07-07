@@ -1,112 +1,64 @@
 export type AILanguage = "id" | "en";
+export type ParaphraseStyle = "academic" | "formal" | "concise" | "natural";
 
-export type AIStyle = "academic journal" | "formal" | "concise" | "critical review";
-
-export type AIAction =
-  | "rewrite"
-  | "paraphrase"
-  | "abstract"
-  | "outline"
-  | "improve-argument"
-  | "summarize";
-
-export interface AIRequestBody {
+export interface ParaphraseRequestBody {
   text: string;
   language: AILanguage;
-  style: AIStyle;
+  style: ParaphraseStyle;
   userInstructions?: string;
 }
 
-export interface AISuccessResponse {
-  result: string;
-}
+export interface AISuccessResponse { result: string; }
+export interface AIErrorResponse { error: string; }
 
-export interface AIErrorResponse {
-  error: string;
-}
-
-export interface AIOptions {
-  language: AILanguage;
-  style: AIStyle;
-  userInstructions?: string;
-}
-
-export type ArticleType = "research article" | "literature review" | "conceptual paper" | "case study";
-export type AcademicField = "education" | "technology" | "health" | "social" | "economics" | "law" | "custom";
-export type TargetLength = "short" | "medium" | "long";
-export type AgentStep =
-  | "start"
-  | "plan"
-  | "outline"
-  | "research_gap"
-  | "introduction"
-  | "literature_review"
-  | "methodology"
-  | "results_discussion"
-  | "conclusion"
-  | "abstract"
-  | "revision"
-  | "continue";
-
-export interface AgentHistoryItem {
-  role: "user" | "assistant";
-  content: string;
-}
-
-export interface SuggestedAction {
-  label: string;
-  action: AgentStep | string;
-  instruction: string;
-}
-
-export type DocumentBlockType =
-  | "title"
-  | "author"
-  | "abstract"
-  | "keywords"
-  | "heading1"
-  | "heading2"
-  | "paragraph"
-  | "numbered"
-  | "bullet"
-  | "quote"
-  | "note";
-
-export interface DocumentBlockFormat {
-  fontName?: string;
-  fontSize?: number;
-  bold?: boolean;
-  italic?: boolean;
-  underline?: boolean;
-  alignment?: "left" | "center" | "right" | "justify";
-  lineSpacing?: number;
-  spaceAfter?: number;
-  spaceBefore?: number;
-}
-
-export interface DocumentBlock {
-  type: DocumentBlockType;
+export interface DocumentParagraph {
+  index: number;
   text: string;
-  format?: DocumentBlockFormat;
+  wordCount: number;
 }
 
-export interface AgentRequestBody {
-  message: string;
-  language: AILanguage;
-  articleType: ArticleType;
-  field: AcademicField;
-  customField?: string;
-  style: AIStyle;
-  targetLength: TargetLength;
-  currentStep: AgentStep;
-  documentContext?: string;
-  history?: AgentHistoryItem[];
+export interface DocumentAnalysisRequest {
+  text: string;
+  paragraphs: DocumentParagraph[];
+  language?: AILanguage;
 }
 
-export interface AgentResponse {
-  result: string;
-  blocks: DocumentBlock[];
-  suggestedActions: SuggestedAction[];
-  nextStep: AgentStep;
-  safetyNotes?: string[];
+export type AnalysisType = "similarity" | "ai-detector";
+export type RiskLevel = "low" | "medium" | "high";
+
+export interface SourceCandidate {
+  title: string;
+  url: string;
+  provider: string;
+  snippet?: string;
+  doi?: string;
+  similarity?: number;
+  confidence?: "low" | "medium" | "high";
+}
+
+export interface FlaggedItem {
+  paragraphIndex: number;
+  score: number;
+  reason: string;
+  text: string;
+  matchedParagraphIndex?: number;
+  sources?: SourceCandidate[];
+}
+
+export interface AnalysisStats {
+  wordCount: number;
+  paragraphCount: number;
+  estimatedPages: number;
+}
+
+export interface AnalysisResponse {
+  type: AnalysisType;
+  score: number;
+  riskLevel: RiskLevel;
+  summary: string;
+  stats: AnalysisStats;
+  flaggedItems: FlaggedItem[];
+  sources: SourceCandidate[];
+  limitations: string[];
+  generatedAt: string;
 }

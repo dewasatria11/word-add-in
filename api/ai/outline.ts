@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { applyCors } from "../_lib/cors";
-import { validateAIRequest, ValidationError } from "../_lib/validateRequest";
-import { callAI, AIServiceError } from "../_lib/callAI";
-import { sendError, sendJson, getSafeErrorMessage } from "../_lib/response";
-import type { AIRequestBody, AISuccessResponse } from "../../src/shared/types";
+import { applyCors } from "../_lib/cors.js";
+import { validateAIRequest, ValidationError } from "../_lib/validateRequest.js";
+import { callAI, AIServiceError } from "../_lib/callAI.js";
+import { sendError, sendJson, getSafeErrorMessage } from "../_lib/response.js";
+import type { AIRequestBody, AISuccessResponse } from "../../src/shared/types.js";
 
 export default async function (req: VercelRequest, res: VercelResponse): Promise<void> {
   if (applyCors(req, res)) {

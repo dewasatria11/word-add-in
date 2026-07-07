@@ -1,5 +1,5 @@
 import type { VercelRequest } from "@vercel/node";
-import type { AIRequestBody, AIStyle, AILanguage } from "../../src/shared/types";
+import type { AIRequestBody, AIStyle, AILanguage } from "../../src/shared/types.js";
 
 const ALLOWED_LANGUAGES = new Set<AILanguage>(["id", "en"]);
 const ALLOWED_STYLES = new Set<AIStyle>([

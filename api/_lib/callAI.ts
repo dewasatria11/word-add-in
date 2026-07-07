@@ -1,5 +1,5 @@
-import type { AIAction, AIRequestBody } from "../../src/shared/types";
-import { createSystemPrompt } from "./prompts";
+import type { AIAction, AIRequestBody } from "../../src/shared/types.js";
+import { createSystemPrompt } from "./prompts.js";
 
 interface ChatCompletionResponse {
   choices?: Array<{

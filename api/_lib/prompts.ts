@@ -1,4 +1,4 @@
-import type { AIAction, AIOptions } from "../../src/shared/types";
+import type { AIAction, AIOptions } from "../../src/shared/types.js";
 
 const actionInstructions: Record<AIAction, string> = {
   rewrite: [
